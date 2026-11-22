@@ -75,6 +75,7 @@ model SchoolClass {
   classSubjects ClassSubject[]
   submissions   ResultSubmission[]
   cbtExams      CbtExam[]
+  fees          ClassFee[]
 }
 
 model TeacherClass {
@@ -147,9 +148,21 @@ model Term {
   session     AcademicSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   submissions ResultSubmission[]
   remarks     ReportRemark[]
+  fees        ClassFee[]
 
   @@unique([sessionId, number])
   cbtExams   CbtExam[]
+}
+
+model ClassFee {
+  id      String      @id @default(cuid())
+  classId String
+  termId  String
+  amount  Int
+  class   SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  term    Term        @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, termId])
 }
 
 model GradeBand {

@@ -19,6 +19,7 @@ export default async function AdminLayout({ children }) {
     { href: '/admin/teachers', label: 'Teachers' },
     { href: '/admin/classes', label: 'Classes' },
     { href: '/admin/sessions', label: 'Session and term' },
+    { href: '/admin/fees', label: 'School fees' },
     { href: '/admin/subjects', label: 'Subjects' },
     { href: '/admin/grading', label: 'Grading' },
     { href: '/admin/results', label: 'Results', badge: pendingResults || null },

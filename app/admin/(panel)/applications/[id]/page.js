@@ -36,7 +36,6 @@ export default async function ApplicationPage({ params }) {
           <div><dt>Name</dt><dd>{a.guardianName}</dd></div><div><dt>Phone</dt><dd><a href={`tel:${a.guardianPhone}`}>{a.guardianPhone}</a></dd></div>
           <div><dt>Email</dt><dd><a href={`mailto:${a.guardianEmail}`}>{a.guardianEmail}</a></dd></div><div><dt>Address</dt><dd>{a.address}</dd></div>
           <div><dt>Received</dt><dd>{fmtDateTime(a.createdAt)}</dd></div>
-          <div><dt>Email to school</dt><dd>{a.emailSent ? <span className="pill green">Sent</span> : <span className="pill yellow">Not sent</span>}{a.emailError && <div className="muted small">{a.emailError}</div>}</dd></div>
         </dl>
       </div>
       <div className="panel"><h2>Office note</h2>
