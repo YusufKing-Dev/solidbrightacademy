@@ -4,6 +4,7 @@ import { requireUser } from '@/lib/auth';
 import ActionButton from '@/components/ActionButton';
 import { setAnnouncementPublished, deleteAnnouncement } from '@/lib/actions/admin-site';
 import { fmtDate } from '@/lib/utils';
+import { CopyLinkButton } from '@/components/ShareButtons';
 
 export const metadata = { title: 'Announcements', robots: { index: false, follow: false } };
 
@@ -24,6 +25,7 @@ export default async function AnnouncementsAdmin() {
                 <td data-label="Status">{a.published ? <span className="pill green">Published</span> : <span className="pill grey">Hidden</span>}</td>
                 <td className="wide"><div className="row">
                   <Link className="btn btn-small btn-outline" href={`/admin/announcements/${a.id}`}>Edit</Link>
+                  {a.published && <CopyLinkButton path={`/announcements/${a.id}`} />}
                   <ActionButton action={setAnnouncementPublished.bind(null, a.id, !a.published)}>{a.published ? 'Unpublish' : 'Publish'}</ActionButton>
                   <ActionButton action={deleteAnnouncement.bind(null, a.id)} className="btn btn-small btn-danger" confirm="Delete this announcement?">Delete</ActionButton>
                 </div></td>

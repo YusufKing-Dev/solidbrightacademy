@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { fmtDate, lines } from '@/lib/utils';
+import ShareButtons from '@/components/ShareButtons';
 
 async function load(id) {
   return prisma.announcement.findFirst({ where: { id, published: true, publishedAt: { lte: new Date() } } }).catch(() => null);
@@ -28,7 +29,11 @@ export default async function Announcement({ params }) {
         <div className="container prose" style={{ maxWidth: 760 }}>
           {a.imageUrl && <img src={a.imageUrl} alt="" className="photo" style={{ marginBottom: 24 }} />}
           {lines(a.content).map((p, i) => (<p key={i}>{p}</p>))}
-          <p><Link href="/announcements" className="btn btn-outline">Back to announcements</Link></p>
+          <div style={{ marginTop: 28 }}>
+            <p style={{ marginBottom: 8 }}><strong>Share this announcement</strong></p>
+            <ShareButtons path={`/announcements/${a.id}`} title={a.title} />
+          </div>
+          <p style={{ marginTop: 24 }}><Link href="/announcements" className="btn btn-outline">Back to announcements</Link></p>
         </div>
       </section>
     </>
