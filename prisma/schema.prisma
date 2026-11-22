@@ -1,0 +1,350 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum Section {
+  PRE_BASIC
+  BASIC
+  COLLEGE
+}
+
+enum SubmissionStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  ACCEPTED
+  REJECTED
+  ARCHIVED
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  username           String
+  usernameKey        String    @unique
+  passwordHash       String
+  role               Role
+  active             Boolean   @default(true)
+  mustChangePassword Boolean   @default(true)
+  tokenVersion       Int       @default(0)
+  lastLoginAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  teacher            Teacher?
+  student            Student?
+}
+
+model Teacher {
+  id          String             @id @default(cuid())
+  userId      String             @unique
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName    String
+  displayName String
+  phone       String?
+  email       String?
+  createdAt   DateTime           @default(now())
+  assignments TeacherClass[]
+  submissions ResultSubmission[]
+  cbtExams   CbtExam[]
+}
+
+model SchoolClass {
+  id            String             @id @default(cuid())
+  name          String             @unique
+  section       Section
+  sortOrder     Int                @default(0)
+  students      Student[]
+  assignments   TeacherClass[]
+  classSubjects ClassSubject[]
+  submissions   ResultSubmission[]
+  cbtExams      CbtExam[]
+}
+
+model TeacherClass {
+  id        String      @id @default(cuid())
+  teacherId String
+  classId   String
+  teacher   Teacher     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  class     SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, classId])
+}
+
+model Subject {
+  id            String             @id @default(cuid())
+  name          String             @unique
+  classSubjects ClassSubject[]
+  submissions   ResultSubmission[]
+  cbtExams      CbtExam[]
+}
+
+model ClassSubject {
+  id        String      @id @default(cuid())
+  classId   String
+  subjectId String
+  class     SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject   Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, subjectId])
+}
+
+model Student {
+  id            String         @id @default(cuid())
+  userId        String         @unique
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  admissionNo   String         @unique
+  surname       String
+  firstName     String
+  otherNames    String?
+  gender        String
+  dob           DateTime?
+  classId       String
+  class         SchoolClass    @relation(fields: [classId], references: [id])
+  guardianName  String
+  guardianPhone String
+  guardianEmail String?
+  address       String?
+  photoUrl      String?
+  portalEnabled Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  results       Result[]
+  remarks       ReportRemark[]
+
+  @@index([classId])
+  cbtAttempts  CbtAttempt[]
+}
+
+model AcademicSession {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  isCurrent Boolean  @default(false)
+  createdAt DateTime @default(now())
+  terms     Term[]
+}
+
+model Term {
+  id          String             @id @default(cuid())
+  sessionId   String
+  number      Int
+  isCurrent   Boolean            @default(false)
+  session     AcademicSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  submissions ResultSubmission[]
+  remarks     ReportRemark[]
+
+  @@unique([sessionId, number])
+  cbtExams   CbtExam[]
+}
+
+model GradeBand {
+  id       String @id @default(cuid())
+  minScore Int
+  maxScore Int
+  grade    String
+  remark   String
+}
+
+model ResultSubmission {
+  id              String           @id @default(cuid())
+  classId         String
+  subjectId       String
+  termId          String
+  teacherId       String
+  status          SubmissionStatus @default(DRAFT)
+  published       Boolean          @default(false)
+  rejectionReason String?
+  submittedAt     DateTime?
+  reviewedAt      DateTime?
+  publishedAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  class           SchoolClass      @relation(fields: [classId], references: [id])
+  subject         Subject          @relation(fields: [subjectId], references: [id])
+  term            Term             @relation(fields: [termId], references: [id])
+  teacher         Teacher          @relation(fields: [teacherId], references: [id])
+  results         Result[]
+
+  @@unique([classId, subjectId, termId])
+  @@index([status])
+}
+
+model Result {
+  id            String           @id @default(cuid())
+  submissionId  String
+  studentId     String
+  ca            Float?
+  exam          Float?
+  total         Float?
+  grade         String?
+  remark        String?
+  teacherRemark String?
+  submission    ResultSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  student       Student          @relation(fields: [studentId], references: [id])
+
+  @@unique([submissionId, studentId])
+  @@index([studentId])
+}
+
+model ReportRemark {
+  id                 String  @id @default(cuid())
+  studentId          String
+  termId             String
+  classTeacherRemark String?
+  principalRemark    String?
+  student            Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  term               Term    @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, termId])
+}
+
+model Application {
+  id             String            @id @default(cuid())
+  applicantName  String
+  dob            DateTime
+  gender         String
+  guardianName   String
+  guardianPhone  String
+  guardianEmail  String
+  address        String
+  classApplying  String
+  previousSchool String?
+  notes          String?
+  status         ApplicationStatus @default(PENDING)
+  adminNote      String?
+  emailSent      Boolean           @default(false)
+  emailError     String?
+  ipHash         String?
+  createdAt      DateTime          @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
+  ipHash    String?
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  category    String?
+  imageUrl    String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model GalleryImage {
+  id        String  @id @default(cuid())
+  url       String
+  caption   String?
+  sortOrder Int     @default(0)
+  active    Boolean @default(true)
+}
+
+model SiteSetting {
+  key   String @id
+  value String
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actorName String
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+model CbtExam {
+  id              String        @id @default(cuid())
+  title           String
+  instructions    String?
+  classId         String
+  subjectId       String
+  termId          String?
+  teacherId       String?
+  durationMinutes Int           @default(30)
+  startsAt        DateTime?
+  endsAt          DateTime?
+  published       Boolean       @default(false)
+  shuffle         Boolean       @default(true)
+  showResult      Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  class           SchoolClass   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject         Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  term            Term?         @relation(fields: [termId], references: [id], onDelete: SetNull)
+  teacher         Teacher?      @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+  questions       CbtQuestion[]
+  attempts        CbtAttempt[]
+
+  @@index([classId])
+}
+
+model CbtQuestion {
+  id           String   @id @default(cuid())
+  examId       String
+  text         String
+  options      String[]
+  correctIndex Int
+  marks        Float    @default(1)
+  sortOrder    Int      @default(0)
+  exam         CbtExam  @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@index([examId])
+}
+
+model CbtAttempt {
+  id          String    @id @default(cuid())
+  examId      String
+  studentId   String
+  startedAt   DateTime  @default(now())
+  deadline    DateTime
+  submittedAt DateTime?
+  score       Float?
+  totalMarks  Float?
+  answers     Json      @default("{}")
+  order       Json?
+  exam        CbtExam   @relation(fields: [examId], references: [id], onDelete: Cascade)
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, studentId])
+}
