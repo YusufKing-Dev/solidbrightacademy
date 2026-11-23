@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 // Shared layout for the admin, teacher and student dashboards.
-export default function DashShell({ roleLabel, home, nav, userName, logo, logout, topExtra, children }) {
+export default function DashShell({ roleLabel, home, nav, userName, logo, logout, topExtra, canChangePassword = true, children }) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const active = (h) => (h === home ? path === home : path.startsWith(h));
@@ -27,7 +27,7 @@ export default function DashShell({ roleLabel, home, nav, userName, logo, logout
         </nav>
         <div className="dash-foot">
           <div className="dash-user">{userName}</div>
-          <Link href={home + '/password'} className="dash-small" onClick={() => setOpen(false)}>Change password</Link>
+          {canChangePassword && <Link href={home + '/password'} className="dash-small" onClick={() => setOpen(false)}>Change password</Link>}
           <form action={logout}><button type="submit" className="btn btn-yellow btn-small btn-block">Log out</button></form>
           <Link href="/" className="dash-small" target="_blank">View school website</Link>
         </div>

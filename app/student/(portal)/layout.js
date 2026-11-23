@@ -15,7 +15,7 @@ export default async function StudentLayout({ children }) {
   ];
   return (
     <DashShell roleLabel="Student Portal" home="/student" nav={nav} userName={studentName(user.student)} logo={s.logo}
-      logout={logoutAction.bind(null, 'STUDENT')} topExtra={<CurrentTerm />}>
+      logout={logoutAction.bind(null, 'STUDENT')} topExtra={<CurrentTerm />} canChangePassword={false}>
       {children}
     </DashShell>
   );

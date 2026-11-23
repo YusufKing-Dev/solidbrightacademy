@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import ActionForm from '@/components/ActionForm';
 import PasswordInput from '@/components/PasswordInput';
 import { changePasswordAction } from '@/lib/actions/auth';
@@ -7,6 +8,8 @@ import { getSettings } from '@/lib/settings';
 
 export default async function PasswordPage({ role, first }) {
   const user = await requireUser(role, { allowMustChange: true });
+  // Students keep using their surname, so they have no change-password page.
+  if (role === 'STUDENT' && !user.mustChangePassword) redirect('/student');
   const s = await getSettings();
   const must = user.mustChangePassword;
   return (
