@@ -1,6 +1,6 @@
 import ActionForm from '@/components/ActionForm';
 import ImageField from '@/components/ImageField';
-import { SECTION_LABEL, toInputDate } from '@/lib/utils';
+import { SECTION_LABEL } from '@/lib/utils';
 
 export default function StudentForm({ action, student, classes, suggestion, submit = 'Save student' }) {
   const s = student || {};
@@ -28,11 +28,6 @@ export default function StudentForm({ action, student, classes, suggestion, subm
       <label className="field"><span className="lbl req">Gender</span>
         <select name="gender" required defaultValue={s.gender || ''}><option value="" disabled>Select</option><option>Male</option><option>Female</option></select>
       </label>
-      <label className="field"><span className="lbl">Date of birth</span><input name="dob" type="date" defaultValue={toInputDate(s.dob)} /></label>
-      <label className="field"><span className="lbl req">Parent or guardian name</span><input name="guardianName" required defaultValue={s.guardianName || ''} maxLength={120} /></label>
-      <label className="field"><span className="lbl req">Parent or guardian phone</span><input name="guardianPhone" type="tel" required defaultValue={s.guardianPhone || ''} inputMode="tel" /></label>
-      <label className="field"><span className="lbl">Parent or guardian email</span><input name="guardianEmail" type="email" defaultValue={s.guardianEmail || ''} /></label>
-      <label className="field span2"><span className="lbl">Address</span><textarea name="address" rows={2} defaultValue={s.address || ''} maxLength={300} /></label>
       <div className="span2"><ImageField name="photoUrl" label="Photograph" folder="students" round defaultValue={s.photoUrl || ''} /></div>
       {!student && (
         <label className="field span2"><span className="lbl">First password (optional)</span>

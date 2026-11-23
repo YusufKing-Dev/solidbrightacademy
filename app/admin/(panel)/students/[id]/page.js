@@ -7,7 +7,7 @@ import ActionForm from '@/components/ActionForm';
 import ActionButton from '@/components/ActionButton';
 import PortalToggle from '@/components/PortalToggle';
 import { updateStudent, setPortalAccess, resetStudentPassword, setStudentActive, deleteStudent } from '@/lib/actions/admin-people';
-import { studentName, SECTION_LABEL, fmtDate, fmtDateTime } from '@/lib/utils';
+import { studentName, SECTION_LABEL, fmtDateTime } from '@/lib/utils';
 
 export const metadata = { title: 'Student', robots: { index: false, follow: false } };
 
@@ -40,9 +40,6 @@ export default async function StudentPage({ params, searchParams }) {
         </div>
         <dl className="dl" style={{ marginTop: 18 }}>
           <div><dt>Gender</dt><dd>{st.gender}</dd></div>
-          <div><dt>Date of birth</dt><dd>{st.dob ? fmtDate(st.dob) : '-'}</dd></div>
-          <div><dt>Parent or guardian</dt><dd>{st.guardianName}, {st.guardianPhone}{st.guardianEmail ? ', ' + st.guardianEmail : ''}</dd></div>
-          <div><dt>Address</dt><dd>{st.address || '-'}</dd></div>
           <div><dt>Portal access</dt><dd><PortalToggle action={setPortalAccess.bind(null, st.id)} enabled={st.portalEnabled} name={name} /></dd></div>
         </dl>
       </div>

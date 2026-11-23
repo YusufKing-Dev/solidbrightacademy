@@ -53,14 +53,13 @@ export default async function TeacherClass({ params, searchParams }) {
         ) : (
           <div className="table-wrap">
             <table className="rtable">
-              <thead><tr><th>Name</th><th>Admission no</th><th>Gender</th><th>Parent or guardian</th></tr></thead>
+              <thead><tr><th>Name</th><th>Admission no</th><th>Gender</th></tr></thead>
               <tbody>
                 {students.map((s) => (
                   <tr key={s.id}>
                     <td data-label="Name"><strong>{studentName(s)}</strong></td>
                     <td data-label="Admission no">{s.admissionNo}</td>
                     <td data-label="Gender">{s.gender}</td>
-                    <td data-label="Parent or guardian">{s.guardianName}, <a href={`tel:${s.guardianPhone}`}>{s.guardianPhone}</a></td>
                   </tr>
                 ))}
               </tbody>

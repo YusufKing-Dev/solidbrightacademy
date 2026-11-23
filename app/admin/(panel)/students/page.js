@@ -52,14 +52,13 @@ export default async function Students({ searchParams }) {
         ) : (
           <div className="table-wrap">
             <table className="rtable">
-              <thead><tr><th>Name</th><th>Admission no</th><th>Class</th><th>Parent or guardian</th><th>Portal access</th><th></th></tr></thead>
+              <thead><tr><th>Name</th><th>Admission no</th><th>Class</th><th>Portal access</th><th></th></tr></thead>
               <tbody>
                 {students.map((s) => (
                   <tr key={s.id}>
                     <td data-label="Name"><strong>{studentName(s)}</strong>{!s.user.active && <span className="pill grey" style={{ marginLeft: 8 }}>Inactive</span>}</td>
                     <td data-label="Admission no">{s.admissionNo}</td>
                     <td data-label="Class">{s.class.name}</td>
-                    <td data-label="Parent or guardian">{s.guardianName}<br /><a href={`tel:${s.guardianPhone}`}>{s.guardianPhone}</a></td>
                     <td data-label="Portal access"><PortalToggle action={setPortalAccess.bind(null, s.id)} enabled={s.portalEnabled} name={studentName(s)} /></td>
                     <td><Link className="btn btn-small btn-outline" href={`/admin/students/${s.id}`}>Open</Link></td>
                   </tr>

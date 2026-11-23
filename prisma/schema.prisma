@@ -118,8 +118,8 @@ model Student {
   dob           DateTime?
   classId       String
   class         SchoolClass    @relation(fields: [classId], references: [id])
-  guardianName  String
-  guardianPhone String
+  guardianName  String?
+  guardianPhone String?
   guardianEmail String?
   address       String?
   photoUrl      String?
